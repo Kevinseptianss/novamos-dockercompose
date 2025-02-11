@@ -14,9 +14,9 @@ services:
     build:
       context: ./backend
     environment:
-      DATABASE_URL: postgres://postgres:Dem4ngsar!@db:5432/mydb
+      DATABASE_URL: postgres://postgres:Dem4ngsar!@db:5432/db_novamos
     ports:
-      - "5000:5000"
+      - "3000:3000"
     depends_on:
       - db
 
