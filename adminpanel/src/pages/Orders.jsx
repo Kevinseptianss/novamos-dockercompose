@@ -150,11 +150,11 @@ const Orders = () => {
             Tipe Pembayaran : <b>{payment.payment}</b> <br />{" "}
             {payment.image ? (
               <img
-                src={`http://localhost:3000/orders/upload/${payment.image}`}
+                src={`http://103.146.202.98:3000/orders/upload/${payment.image}`}
                 style={{ height: 100, width: 100, cursor: "pointer" }}
                 onClick={() =>
                   openModal(
-                    `http://localhost:3000/orders/upload/${payment.image}`
+                    `http://103.146.202.98:3000/orders/upload/${payment.image}`
                   )
                 }
                 alt="Payment"

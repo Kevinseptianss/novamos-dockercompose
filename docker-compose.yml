@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:14
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: Dem4ngsar!
+      POSTGRES_DB: db_novamos
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
