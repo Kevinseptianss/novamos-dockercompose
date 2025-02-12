@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:3000'; // Change to your backend URL
+const API_URL = 'http://103.146.202.98/:3000'; // Change to your backend URL
 
 // -----------------Items-----------------------------
 export const fetchItems = async () => {
