@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ItemForm from "../components/ItemForm";
 import ItemList from "../components/ItemList";
 import { createItem, fetchCategory, fetchItems } from "../api/api";
@@ -12,6 +12,10 @@ const Items = () => {
     const data = await fetchItems();
     setItems(data || []); // Ensure items is always an array
   };
+
+  useEffect(() => {
+    loadItems();
+  }, []); 
 
   const handleSubmit = async (formData) => {
     try {

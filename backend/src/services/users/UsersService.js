@@ -5,9 +5,13 @@ const InvariantError = require("../../exceptions/InvariantError");
 const { mapDBToModel } = require("../../utils");
 const NotFoundError = require("../../exceptions/NotFoundError");
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
 class UsersService {
   constructor() {
-    this._pool = new Pool();
+    this._pool = pool;
   }
 
   async addOTP({ otp, uniq }) {

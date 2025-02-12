@@ -1,9 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 const { Pool } = require("pg");
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
 class OrderService {
   constructor() {
-    this._pool = new Pool(); // Initialize the PostgreSQL connection pool
+    this._pool = pool; // Initialize the PostgreSQL connection pool
   }
 
   // Method to create a new order

@@ -1,9 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 const { Pool } = require("pg");
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
 class ArticlesService {
   constructor() {
-    this._pool = new Pool();
+    this._pool = pool;
   }
 
   async postArticle({ title, category, date, body, image }) {

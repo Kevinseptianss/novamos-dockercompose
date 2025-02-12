@@ -3,9 +3,13 @@ const { Pool } = require("pg");
 const InvariantError = require("../../exceptions/InvariantError");
 const NotFoundError = require("../../exceptions/NotFoundError");
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
 class VouchersService {
   constructor() {
-    this._pool = new Pool();
+    this._pool = pool;
   }
 
   async getVouchers() {
