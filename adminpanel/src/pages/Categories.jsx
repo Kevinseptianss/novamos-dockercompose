@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CategoryForm from "../components/CategoryForm"; // Update to CategoryForm
 import CategoryList from "../components/CategoryList"; // Update to CategoryList
 import { createCategory, fetchCategory } from "../api/api"; // Update to fetchCategories
 import CategoryFormEdit from "../components/CategoryFormEdit"; // Update to CategoryEdit
+import { checkAuth } from "../utils/utils";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]); // Change items to categories
@@ -12,6 +13,13 @@ const Categories = () => {
     const data = await fetchCategory(); // Update to fetchCategories
     setCategories(data || []); // Ensure categories is always an array
   };
+
+  useEffect(() => {
+    if (!checkAuth()) {
+      window.location.href = "/login";
+    }
+    loadCategories();
+  }, []);
 
   const handleSubmit = async (formData) => {
     try {

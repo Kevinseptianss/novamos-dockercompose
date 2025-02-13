@@ -3,6 +3,7 @@ import ItemForm from "../components/ItemForm";
 import ItemList from "../components/ItemList";
 import { createItem, fetchCategory, fetchItems } from "../api/api";
 import ItemFormEdit from "../components/ItemEdit";
+import { checkAuth } from "../utils/utils";
 
 const Items = () => {
   const [items, setItems] = useState([]);
@@ -14,6 +15,9 @@ const Items = () => {
   };
 
   useEffect(() => {
+    if (!checkAuth()) {
+      window.location.href = "/login";
+    }
     loadItems();
   }, []); 
 

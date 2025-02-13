@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ArticleForm from "../components/ArticleForm";
 import ArticleList from "../components/ArticleList";
 import { createArticle, fetchArticles } from "../api/api";
 import ArticleFormEdit from "../components/ArticleFormEdit";
+import { checkAuth } from "../utils/utils";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
@@ -12,6 +13,12 @@ const Articles = () => {
     const data = await fetchArticles();
     setArticles(data || []); // Ensure articles is always an array
   };
+
+  useEffect(() => {
+    if (!checkAuth()) {
+      window.location.href = "/login";
+    }
+  }, []);
 
   const handleSubmit = async (formData) => {
     try {

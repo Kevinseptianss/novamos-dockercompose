@@ -7,6 +7,7 @@ import Categories from './pages/Categories';
 import Vouchers from './pages/Voucher';
 import Articles from './pages/Article';
 import Orders from './pages/Orders';
+import Login from './pages/Login';
 
 const App = () => {
     return (
@@ -23,6 +24,7 @@ const App = () => {
                             <Route path="/categories" element={<Categories />} />
                             <Route path="/vouchers" element={<Vouchers />} />
                             <Route path="/article" element={<Articles />} />
+                            <Route path='/login' element={<Login />} />
                         </Routes>
                     </div>
                 </div>

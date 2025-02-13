@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 function convertRupiahToInteger(rupiahString) {
   if (!rupiahString) return 0;
   const cleanedString = rupiahString.replace(/Rp\s*|\.|/g, "");
@@ -24,4 +26,21 @@ function convertIntegerToRupiah(amount) {
   }
 }
 
-export { convertIntegerToRupiah, convertRupiahToInteger };
+function checkAuth() {
+  const password = localStorage.getItem("pass");
+  if (password) {
+    return isMatch(localStorage.getItem("pass"));
+  } else {
+    return false;
+  }
+}
+
+function isMatch(password) {
+  const hashedPassword = getPassword();
+  return bcrypt.compareSync(password, hashedPassword);
+}
+function getPassword() {
+  return bcrypt.hashSync('Dem4ngsar!', 10);
+}
+
+export { convertIntegerToRupiah, convertRupiahToInteger, getPassword, isMatch, checkAuth };

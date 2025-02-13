@@ -1,22 +1,34 @@
-import { useState } from "react";
-import VoucherForm from "../components/VoucherForm"; // Assuming you have a VoucherForm component
-import VoucherList from "../components/VoucherList"; // Assuming you have a VoucherList component
-import { createVoucher, fetchCategory, fetchVouchers } from "../api/api"; // Assuming you have a createVoucher and fetchVouchers function
-import VoucherFormEdit from "../components/VoucherFormEdit"; // Assuming you have a VoucherEdit component
+import { useState, useEffect } from "react";
+import VoucherForm from "../components/VoucherForm";
+import VoucherList from "../components/VoucherList";
+import { createVoucher, fetchVouchers } from "../api/api"; // Removed fetchCategory import
+import VoucherFormEdit from "../components/VoucherFormEdit";
+import { checkAuth } from "../utils/utils";
 
 const Vouchers = () => {
   const [vouchers, setVouchers] = useState([]);
-  const [vouchersEdit, setVouchersEdit] = useState(0);
-
+  const [voucherEditId, setVoucherEditId] = useState(0); // Renamed for clarity
   const loadVouchers = async () => {
-    const data = await fetchVouchers(); // Fetch vouchers instead of items
-    setVouchers(data || []); // Ensure vouchers is always an array
+    try {
+      const data = await fetchVouchers(); // Fetch vouchers
+      setVouchers(data || []); // Ensure vouchers is always an array
+    } catch (error) {
+      console.error("Error fetching vouchers:", error);
+      // Optionally, you can set an error state here to display an error message
+    }
   };
+  
+  // Load vouchers on component mount
+  useEffect(() => {
+    if (!checkAuth()) {
+      window.location.href = "/login";
+    }
+    loadVouchers();
+  }, []); // Load vouchers when the component mounts
 
   const handleSubmit = async (formData) => {
     try {
-      // Create voucher logic
-      const newVoucher = await createVoucher(formData); // Create a voucher instead of an item
+      const newVoucher = await createVoucher(formData); // Create a voucher
       setVouchers((prevVouchers) => [...prevVouchers, newVoucher]);
     } catch (error) {
       console.error("Error submitting voucher:", error);
@@ -26,17 +38,15 @@ const Vouchers = () => {
 
   return (
     <div className="p-4">
-      {vouchersEdit === 0 ? (
+      {voucherEditId === 0 ? ( // Check if we are editing a voucher
         <VoucherForm
           onSubmit={handleSubmit}
-          fetchCategory={fetchCategory}
           loadVouchers={loadVouchers} // Update to loadVouchers
         />
       ) : (
         <VoucherFormEdit
-          id={vouchersEdit}
-          setVouchersEdit={setVouchersEdit} // Update to setVouchersEdit
-          fetchCategory={fetchCategory}
+          id={voucherEditId}
+          setVouchersEdit={setVoucherEditId} // Update to setVouchersEdit
           loadVouchers={loadVouchers} // Update to loadVouchers
         />
       )}
@@ -45,8 +55,8 @@ const Vouchers = () => {
         vouchers={vouchers} // Update to vouchers
         setVouchers={setVouchers} // Update to setVouchers
         loadVouchers={loadVouchers} // Update to loadVouchers
-        vouchersEdit={vouchersEdit} // Update to vouchersEdit
-        setVouchersEdit={setVouchersEdit} // Update to setVouchersEdit
+        vouchersEdit={voucherEditId} // Update to vouchersEdit
+        setVouchersEdit={setVoucherEditId} // Update to setVouchersEdit
       />
     </div>
   );
