@@ -11,6 +11,8 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - novamos_network
 
   backend:
     build:
@@ -27,8 +29,8 @@ services:
   adminpanel:
     build:
       context: ./adminpanel
-    expose:
-      - "80:80"
+    ports:
+      - "8080:80"
     depends_on:
       - backend
     networks:
