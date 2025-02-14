@@ -8,6 +8,7 @@ import Vouchers from './pages/Voucher';
 import Articles from './pages/Article';
 import Orders from './pages/Orders';
 import Login from './pages/Login';
+import Users from './pages/Users';
 
 const App = () => {
     return (
@@ -25,6 +26,7 @@ const App = () => {
                             <Route path="/vouchers" element={<Vouchers />} />
                             <Route path="/article" element={<Articles />} />
                             <Route path='/login' element={<Login />} />
+                            <Route path='/users' element={<Users />} />
                         </Routes>
                     </div>
                 </div>

@@ -6,20 +6,15 @@ class UsersHandler {
     this._service = service;
     this._validator = validator;
 
-    this.postNoteHandler = this.postNoteHandler.bind(this);
-    this.getNotesHandler = this.getNotesHandler.bind(this);
-    this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
-    this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
-    this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
     this.postOtp = this.postOtp.bind(this);
     this.checkOtp = this.checkOtp.bind(this);
     this.postUser = this.postUser.bind(this);
     this.getUser = this.getUser.bind(this);
+    this.getUsersAdmin = this.getUsersAdmin.bind(this);
   }
 
   async postOtp(request, h) {
     this._validator.validatePhonePayload(request.payload);
-    console.log(request.payload);
     const { phone } = request.payload;
     const otp = generateOTP();
     const uniq = generateUniqueId();
@@ -71,7 +66,6 @@ class UsersHandler {
   async getUser(request, h) {
     const { id: credentialId } = request.auth.credentials;
     const result = await this._service.getUser(credentialId);
-    console.log(request.auth.credentials);
     if (result) {
       return h
         .response({
@@ -92,66 +86,26 @@ class UsersHandler {
     }
   }
 
-  // ------------------------------------------------------------------------------------------------
-
-  async postNoteHandler(request, h) {
-    this._validator.validateNotePayload(request.payload);
-    const { title = "untitled", body, tags } = request.payload;
-
-    const noteId = await this._service.addNote({ title, body, tags });
-
-    const response = h.response({
-      status: "success",
-      message: "Catatan berhasil ditambahkan",
-      data: {
-        noteId,
-      },
-    });
-    response.code(201);
-    return response;
-  }
-
-  async getNotesHandler() {
-    const notes = await this._service.getNotes();
-    return {
-      status: "success",
-      data: {
-        notes,
-      },
-    };
-  }
-
-  async getNoteByIdHandler(request) {
-    const { id } = request.params;
-    const note = await this._service.getNoteById(id);
-    return {
-      status: "success",
-      data: {
-        note,
-      },
-    };
-  }
-
-  async putNoteByIdHandler(request) {
-    this._validator.validateNotePayload(request.payload);
-    const { id } = request.params;
-
-    await this._service.editNoteById(id, request.payload);
-
-    return {
-      status: "success",
-      message: "Catatan berhasil diperbarui",
-    };
-  }
-
-  async deleteNoteByIdHandler(request) {
-    const { id } = request.params;
-    await this._service.deleteNoteById(id);
-
-    return {
-      status: "success",
-      message: "Catatan berhasil dihapus",
-    };
+  async getUsersAdmin(request, h) {
+    const result = await this._service.getUserAdmin();
+    if (result) {
+      return h
+        .response({
+          status: "success",
+          message: "User found",
+          data: {
+            user: result,
+          },
+        })
+        .code(200);
+    } else {
+      return h
+        .response({
+          status: "failed",
+          message: "User Not Found",
+        })
+        .code(404);
+    }
   }
 }
 

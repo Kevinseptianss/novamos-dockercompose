@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://103.146.202.98:3000'; // Change to your backend URL
+const API_URL = 'http://127.0.0.1:3000'; // Change to your backend URL
 
 // -----------------Items-----------------------------
 export const fetchItems = async () => {
@@ -38,7 +38,6 @@ export const fetchCategory = async () => {
 
 export const createCategory = async (category) => {
     const response = await axios.post(`${API_URL}/categories`, category);
-    console.log(response.data);
     return response.data;
 };
 
@@ -135,3 +134,10 @@ export const deleteOrder = async (id) => {
     const response = await axios.delete(`${API_URL}/orders/${id}`);
     return response.data;
 };
+
+// -----------------Orders-----------------------------
+
+export const getUsers = async () => {
+    const response = await axios.get(`${API_URL}/usersadmin`);
+    return response.data.users
+}
