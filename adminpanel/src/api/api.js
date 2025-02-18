@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://api.kucing.in"; // Change to your backend URL
+const API_URL = "https://api.kucing.in";
+// const API_URL = "http://0.0.0.0:3000"; // Change to your backend URL
 
 // -----------------Items-----------------------------
 export const fetchItems = async () => {

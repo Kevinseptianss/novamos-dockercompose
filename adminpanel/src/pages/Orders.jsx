@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { fetchOrders, updateOrderAWB, updateOrderStatus } from "../api/api";
 import { checkAuth } from "../utils/utils";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import the CSS
 
 const Modal = ({ isOpen, onClose, imageSrc }) => {
   if (!isOpen) return null;
@@ -24,11 +26,13 @@ const Modal = ({ isOpen, onClose, imageSrc }) => {
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]); // State for filtered orders
-  const [searchTerm, setSearchTerm] = useState(""); // State for search term
-  const [filter, setFilter] = useState(""); // State for filter
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("");
   const [payment, setPayment] = useState("");
   const [modal, setModal] = useState({ isOpen: false, imageSrc: "" });
+  const [startDate, setStartDate] = useState(null); // State for start date
+  const [endDate, setEndDate] = useState(null); // State for end date
 
   const openModal = (imageSrc) => {
     setModal({ isOpen: true, imageSrc });
@@ -41,25 +45,25 @@ const Orders = () => {
   async function loadOrders() {
     try {
       const data = await fetchOrders();
-      setOrders(data || []); // Ensure orders is always an array
-      setFilteredOrders(data || []); // Initialize filteredOrders with the fetched data
+      setOrders(data || []);
+      setFilteredOrders(data || []);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
-  };
+  }
 
   useEffect(() => {
     const checkAuthentication = async () => {
-      const isAuthenticated = await checkAuth(); // Assuming checkAuth is an async function
+      const isAuthenticated = await checkAuth();
       if (!isAuthenticated) {
         window.location.href = "/login";
       } else {
-        loadOrders(); // Proceed to load users if authenticated
+        loadOrders();
       }
     };
-  
+
     checkAuthentication();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
@@ -74,10 +78,16 @@ const Orders = () => {
   const handlePayment = (pay) => {
     setPayment(pay);
     applyFilters(searchTerm, filter, pay);
-  }
+  };
 
-  // Apply both search and filter to orders
-  const applyFilters = (searchTerm, filter, pay) => {
+  const handleDateRangeChange = (dates) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+    applyFilters(searchTerm, filter, payment, start, end);
+  };
+
+  const applyFilters = (searchTerm, filter, pay, startDate, endDate) => {
     let filtered = orders;
 
     // Apply search term filter
@@ -92,7 +102,7 @@ const Orders = () => {
           order.id.toString().includes(searchTerm) ||
           user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           address.phone?.includes(searchTerm) ||
-          courier.awb?.includes(searchTerm)||
+          courier.awb?.includes(searchTerm) ||
           payment.payment?.includes(searchTerm)
         );
       });
@@ -126,13 +136,37 @@ const Orders = () => {
       });
     }
 
+    // Apply payment filter
     if (pay) {
       filtered = filtered.filter((order) => {
         const payment = JSON.parse(order.payment);
+        return payment.payment?.includes(pay);
+      });
+    }
 
-        return (
-          payment.payment?.includes(pay)
+    // Apply date range filter
+    if (startDate && endDate) {
+      filtered = filtered.filter((order) => {
+        const orderDate = new Date(order.order_date);
+        const orderDateOnly = new Date(
+          orderDate.getFullYear(),
+          orderDate.getMonth(),
+          orderDate.getDate()
         );
+    
+        const startDateOnly = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate()
+        );
+    
+        const endDateOnly = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate()
+        );
+    
+        return orderDateOnly >= startDateOnly && orderDateOnly <= endDateOnly;
       });
     }
 
@@ -163,7 +197,7 @@ const Orders = () => {
       if (event.key === "Enter") {
         const updatedCourier = { ...JSON.parse(order.courier), awb: awbInput };
         updateOrder(order.id, updatedCourier);
-        setAwbInput(""); // Clear input after submission
+        setAwbInput("");
       }
     };
 
@@ -174,8 +208,8 @@ const Orders = () => {
         if (option.title === title) {
           return {
             ...option,
-            status: !option.status, // Toggle the status
-            date: formattedDate, // Add the formatted date property
+            status: !option.status,
+            date: formattedDate,
           };
         }
         return option;
@@ -260,7 +294,7 @@ const Orders = () => {
       );
     } catch (err) {
       console.log(err);
-      return null; // Return null or some fallback UI in case of an error
+      return null;
     }
   };
 
@@ -272,7 +306,7 @@ const Orders = () => {
           <input
             type="text"
             placeholder="Cari ID Order, Nama Customer, Phone, Resi ..."
-            className="border border-gray-300 p-2 rounded w-96"
+            className="border border-gray-300 p-2 rounded w-80"
             onChange={(e) => handleSearch(e.target.value)}
           />
           <select
@@ -293,6 +327,15 @@ const Orders = () => {
             <option value="delivery">Pesanan Dalam Pengiriman</option>
             <option value="deliverd">Pesanan Sampai Tujuan</option>
           </select>
+          <DatePicker
+            selectsRange
+            startDate={startDate}
+            endDate={endDate}
+            onChange={handleDateRangeChange}
+            isClearable
+            placeholderText="Select date range"
+            className="border border-gray-300 p-2 rounded"
+          />
         </div>
       </div>
       <table className="min-w-full border-collapse border border-gray-200">
