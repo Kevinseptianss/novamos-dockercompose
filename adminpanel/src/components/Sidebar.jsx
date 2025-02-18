@@ -11,6 +11,7 @@ const Sidebar = () => {
                 <li><Link to="/users" className="block p-2 hover:bg-gray-700 rounded">Users</Link></li>
                 <li><Link to="/vouchers" className="block p-2 hover:bg-gray-700 rounded">Vouchers</Link></li>
                 <li><Link to="/article" className="block p-2 hover:bg-gray-700 rounded">Article</Link></li>
+                <li><Link to="/admins" className="block p-2 hover:bg-gray-700 rounded">Admins</Link></li>
             </ul>
         </nav>
     );

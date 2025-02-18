@@ -9,16 +9,23 @@ const Articles = () => {
   const [articles, setArticles] = useState([]);
   const [articleEditId, setArticleEditId] = useState(0);
 
-  const loadArticles = async () => {
+  async function loadArticles() {
     const data = await fetchArticles();
     setArticles(data || []); // Ensure articles is always an array
   };
 
   useEffect(() => {
-    if (!checkAuth()) {
-      window.location.href = "/login";
-    }
-  }, []);
+    const checkAuthentication = async () => {
+      const isAuthenticated = await checkAuth(); // Assuming checkAuth is an async function
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+      } else {
+        loadArticles(); // Proceed to load users if authenticated
+      }
+    };
+  
+    checkAuthentication();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleSubmit = async (formData) => {
     try {

@@ -26,11 +26,15 @@ const OrderValidator = require("./validator/order");
 const article = require("./api/article");
 const ArticleService = require("./services/article/ArticleService");
 
+const admin = require("./api/admin");
+const AdminsService = require("./services/admin/AdminsService");
+
 const authentications = require("./api/authentications");
 const AuthenticationsServices = require("./services/auth/AuthenticationsServices");
 const TokenManager = require("./tokenize/TokenManager");
 const AuthenticationsValidator = require("./validator/authentications");
 const items = require("./api/items");
+
 
 const init = async () => {
   const usersService = new UsersService();
@@ -38,6 +42,7 @@ const init = async () => {
   const voucherService = new VouchersService();
   const orderService = new OrderService();
   const articleService = new ArticleService();
+  const adminService = new AdminsService();
   const authenticationsServices = new AuthenticationsServices();
 
   const server = Hapi.server({
@@ -69,6 +74,12 @@ const init = async () => {
   });
 
   await server.register([
+    {
+      plugin: admin,
+      options: {
+        service: adminService,
+      }
+    },
     {
       plugin: article,
       options: {

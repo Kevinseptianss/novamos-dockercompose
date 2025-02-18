@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import { postLoginAdmins } from "../api/api";
 
 function convertRupiahToInteger(rupiahString) {
   if (!rupiahString) return 0;
@@ -26,21 +26,28 @@ function convertIntegerToRupiah(amount) {
   }
 }
 
-function checkAuth() {
+async function isMatch(username, password) {
+  try {
+    const data = await postLoginAdmins(username, password);
+    if (data) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch {
+    return false
+  }
+}
+
+async function checkAuth() {
+  const username = localStorage.getItem("user");
   const password = localStorage.getItem("pass");
-  if (password) {
-    return isMatch(localStorage.getItem("pass"));
+  const isMatched = await isMatch(username, password);
+  if (isMatched) {
+    return true;
   } else {
     return false;
   }
 }
 
-function isMatch(password) {
-  const hashedPassword = getPassword();
-  return bcrypt.compareSync(password, hashedPassword);
-}
-function getPassword() {
-  return bcrypt.hashSync('Dem4ngsar!', 10);
-}
-
-export { convertIntegerToRupiah, convertRupiahToInteger, getPassword, isMatch, checkAuth };
+export { convertIntegerToRupiah, convertRupiahToInteger, isMatch, checkAuth };

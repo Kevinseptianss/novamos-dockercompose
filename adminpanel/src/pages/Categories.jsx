@@ -9,17 +9,23 @@ const Categories = () => {
   const [categories, setCategories] = useState([]); // Change items to categories
   const [categoryEditId, setCategoryEditId] = useState(0); // Change itemsEdit to categoryEditId
 
-  const loadCategories = async () => {
+  async function loadCategories() {
     const data = await fetchCategory(); // Update to fetchCategories
     setCategories(data || []); // Ensure categories is always an array
   };
 
   useEffect(() => {
-    if (!checkAuth()) {
-      window.location.href = "/login";
-    }
-    loadCategories();
-  }, []);
+    const checkAuthentication = async () => {
+      const isAuthenticated = await checkAuth(); // Assuming checkAuth is an async function
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+      } else {
+        loadCategories(); // Proceed to load users if authenticated
+      }
+    };
+  
+    checkAuthentication();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleSubmit = async (formData) => {
     try {

@@ -4,6 +4,7 @@ const Header = () => {
     const handleLogout = () => {
         // Remove the password key from local storage
         localStorage.removeItem('pass');
+        localStorage.removeItem('user');
         window.location.href = '/';
     };
 

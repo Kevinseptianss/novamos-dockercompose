@@ -8,7 +8,7 @@ import { checkAuth } from "../utils/utils";
 const Vouchers = () => {
   const [vouchers, setVouchers] = useState([]);
   const [voucherEditId, setVoucherEditId] = useState(0); // Renamed for clarity
-  const loadVouchers = async () => {
+  async function loadVouchers() {
     try {
       const data = await fetchVouchers(); // Fetch vouchers
       setVouchers(data || []); // Ensure vouchers is always an array
@@ -20,11 +20,17 @@ const Vouchers = () => {
   
   // Load vouchers on component mount
   useEffect(() => {
-    if (!checkAuth()) {
-      window.location.href = "/login";
-    }
-    loadVouchers();
-  }, []); // Load vouchers when the component mounts
+    const checkAuthentication = async () => {
+      const isAuthenticated = await checkAuth(); // Assuming checkAuth is an async function
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+      } else {
+        loadVouchers(); // Proceed to load users if authenticated
+      }
+    };
+  
+    checkAuthentication();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleSubmit = async (formData) => {
     try {

@@ -6,7 +6,7 @@ import { checkAuth } from "../utils/utils";
 const Users = () => {
   const [users, setUsers] = useState([]);
 
-  const loadUsers = async () => {
+  async function loadUsers() {
     try {
       const data = await getUsers();
       console.log(data);
@@ -18,11 +18,17 @@ const Users = () => {
   };
 
   useEffect(() => {
-    if (!checkAuth()) {
-      window.location.href = "/login";
-    }
-    loadUsers();
-  }, []); // Load orders when the component mounts
+    const checkAuthentication = async () => {
+      const isAuthenticated = await checkAuth(); // Assuming checkAuth is an async function
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+      } else {
+        loadUsers(); // Proceed to load users if authenticated
+      }
+    };
+  
+    checkAuthentication();
+  }, []); // Empty dependency array means this runs once on mount
 
 
   const TableRow = ({ user }) => {

@@ -24,6 +24,10 @@ const Modal = ({ isOpen, onClose, imageSrc }) => {
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]); // State for filtered orders
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [filter, setFilter] = useState(""); // State for filter
+  const [payment, setPayment] = useState("");
   const [modal, setModal] = useState({ isOpen: false, imageSrc: "" });
 
   const openModal = (imageSrc) => {
@@ -34,29 +38,113 @@ const Orders = () => {
     setModal({ isOpen: false, imageSrc: "" });
   };
 
-  const loadOrders = async () => {
+  async function loadOrders() {
     try {
       const data = await fetchOrders();
       setOrders(data || []); // Ensure orders is always an array
+      setFilteredOrders(data || []); // Initialize filteredOrders with the fetched data
     } catch (error) {
       console.error("Error fetching orders:", error);
-      // Optionally, you can set an error state here to display an error message
     }
   };
 
   useEffect(() => {
-    if (!checkAuth()) {
-      window.location.href = "/login";
+    const checkAuthentication = async () => {
+      const isAuthenticated = await checkAuth(); // Assuming checkAuth is an async function
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+      } else {
+        loadOrders(); // Proceed to load users if authenticated
+      }
+    };
+  
+    checkAuthentication();
+  }, []); // Empty dependency array means this runs once on mount
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    applyFilters(term, filter, payment);
+  };
+
+  const handleFilter = (selectedFilter) => {
+    setFilter(selectedFilter);
+    applyFilters(searchTerm, selectedFilter, payment);
+  };
+
+  const handlePayment = (pay) => {
+    setPayment(pay);
+    applyFilters(searchTerm, filter, pay);
+  }
+
+  // Apply both search and filter to orders
+  const applyFilters = (searchTerm, filter, pay) => {
+    let filtered = orders;
+
+    // Apply search term filter
+    if (searchTerm) {
+      filtered = filtered.filter((order) => {
+        const user = order.user ? JSON.parse(order.user) : {};
+        const address = JSON.parse(order.address);
+        const courier = JSON.parse(order.courier);
+        const payment = JSON.parse(order.payment);
+
+        return (
+          order.id.toString().includes(searchTerm) ||
+          user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          address.phone?.includes(searchTerm) ||
+          courier.awb?.includes(searchTerm)||
+          payment.payment?.includes(searchTerm)
+        );
+      });
     }
-    loadOrders();
-  }, []); // Load orders when the component mounts
+
+    // Apply status filter
+    if (filter) {
+      filtered = filtered.filter((order) => {
+        const status = JSON.parse(order.status);
+        return status.some((option) => {
+          if (filter === "new" && option.title === "Pesanan Diterima") {
+            return option.status;
+          } else if (
+            filter === "progress" &&
+            option.title === "Pesanan Dikonfirmasi"
+          ) {
+            return option.status;
+          } else if (
+            filter === "delivery" &&
+            option.title === "Pengiriman"
+          ) {
+            return option.status;
+          } else if (
+            filter === "deliverd" &&
+            option.title === "Sampai Tujuan"
+          ) {
+            return option.status;
+          }
+          return false;
+        });
+      });
+    }
+
+    if (pay) {
+      filtered = filtered.filter((order) => {
+        const payment = JSON.parse(order.payment);
+
+        return (
+          payment.payment?.includes(pay)
+        );
+      });
+    }
+
+    setFilteredOrders(filtered);
+  };
 
   const updateOrder = async (id, awbInput) => {
     await updateOrderAWB(id, awbInput);
     loadOrders();
   };
 
-  const TableRow = ({ order, index }) => {
+  const TableRow = ({ order }) => {
     const [awbInput, setAwbInput] = useState("");
     const [statusOptions, setStatusOptions] = useState([]);
 
@@ -107,7 +195,7 @@ const Orders = () => {
 
       return (
         <tr key={order.id}>
-          <td className="border border-gray-300 p-2">{index + 1}</td>
+          <td className="border border-gray-300 p-2">{order.id}</td>
           <td className="border border-gray-300 p-2">{user.name}</td>
           <td className="border border-gray-300 p-2">
             {formatISODateString(order.order_date)}
@@ -178,12 +266,40 @@ const Orders = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Orders</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">Orders</h1>
+        <div className="flex items-center space-x-4">
+          <input
+            type="text"
+            placeholder="Cari ID Order, Nama Customer, Phone, Resi ..."
+            className="border border-gray-300 p-2 rounded w-96"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+          <select
+            className="border border-gray-300 p-2 rounded"
+            onChange={(e) => handlePayment(e.target.value)}
+          >
+            <option value="">Semua Pembayaran</option>
+            <option value="transfer">Transfer</option>
+            <option value="cod">COD</option>
+          </select>
+          <select
+            className="border border-gray-300 p-2 rounded"
+            onChange={(e) => handleFilter(e.target.value)}
+          >
+            <option value="">Semua Status</option>
+            <option value="new">Pesanan Baru</option>
+            <option value="progress">Pesanan Diproses</option>
+            <option value="delivery">Pesanan Dalam Pengiriman</option>
+            <option value="deliverd">Pesanan Sampai Tujuan</option>
+          </select>
+        </div>
+      </div>
       <table className="min-w-full border-collapse border border-gray-200">
         <thead>
           <tr>
-            <th className="border border-gray-300 p-2">No</th>
-            <th className="border border-gray-300 p-2">User </th>
+            <th className="border border-gray-300 p-2">ID Order</th>
+            <th className="border border-gray-300 p-2">User</th>
             <th className="border border-gray-300 p-2">Order Date</th>
             <th className="border border-gray-300 p-2">Items</th>
             <th className="border border-gray-300 p-2">Voucher</th>
@@ -194,7 +310,7 @@ const Orders = () => {
           </tr>
         </thead>
         <tbody>
-          {orders
+          {filteredOrders
             .slice()
             .reverse()
             .map((order, index) => (
