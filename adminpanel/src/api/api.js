@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://api.kucing.in";
-// const API_URL = "http://0.0.0.0:3000"; // Change to your backend URL
+//const API_URL = "https://api.kucing.in";
+const API_URL = "http://127.0.0.1:3000"; // Change to your backend URL
 
 // -----------------Items-----------------------------
 export const fetchItems = async () => {
@@ -15,9 +15,20 @@ export const fetchItemsById = async () => {
 };
 
 export const createItem = async (item) => {
-  const response = await axios.post(`${API_URL}/items`, item);
-  console.log(response.data);
-  return response.data;
+  try {
+    const response = await axios.post(`${API_URL}/items`, item);
+    
+    if (response.status >= 200 && response.status < 300) {
+      console.log('Success:', response.data);
+      return response.data;
+    } else {
+      console.error('Unexpected status code:', response.status);
+      throw new Error(`Unexpected status code: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Error creating item:', error);
+    throw error;
+  }
 };
 
 export const updateItem = async (id, item) => {

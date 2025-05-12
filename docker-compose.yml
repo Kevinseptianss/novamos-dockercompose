@@ -42,12 +42,12 @@ services:
   nginx:
     image: nginx:alpine
     volumes:
-      # - ./nginx-withoutssl.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - /etc/letsencrypt:/etc/letsencrypt  # Mount Let's Encrypt certificates
+      - ./nginx-withoutssl.conf:/etc/nginx/conf.d/default.conf
+      #- ./nginx.conf:/etc/nginx/conf.d/default.conf
+      #- /etc/letsencrypt:/etc/letsencrypt  # Mount Let's Encrypt certificates
     ports:
       - "80:80"   # HTTP
-      - "443:443"  # HTTPS
+      #- "443:443"  # HTTPS
     depends_on:
       - adminpanel
       - backend

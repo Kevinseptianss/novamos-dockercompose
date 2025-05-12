@@ -41,10 +41,9 @@ class ItemsHandler {
 
   async postItem(request, h) {
     let imagePaths = []; // Declare imagePaths outside the try block
-  
     try {
       this._validator.validateItemPayload(request.payload);
-      const { title, description, price, category_id } = request.payload;
+      const { title, description, price, category_id, weight } = request.payload;
       const images = request.payload.images; // Get the uploaded files
   
       if (!Array.isArray(images)) {
@@ -81,6 +80,7 @@ class ItemsHandler {
         price,
         images: JSON.stringify(imagePaths), // Save the array of image filenames as a JSON string
         category_id,
+        weight
       });
   
       return h
@@ -104,7 +104,7 @@ class ItemsHandler {
   
       return h
         .response({
-          status: "fail",
+          status: "fail test",
           message: error.message,
         })
         .code(400);

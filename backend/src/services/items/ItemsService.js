@@ -43,13 +43,13 @@ class ItemsService {
     await this._pool.query(query);
   }
 
-  async postItem({ title, description, price, images, category_id }) {
-    const query = {
-      text: "INSERT INTO items (title, description, price, images, category_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-      values: [title, description, price, images, category_id],
-    };
-    const result = await this._pool.query(query);
-    return result.rows[0].id;
+  async postItem({ title, description, price, images, category_id, weight }) {
+      const query = {
+        text: "INSERT INTO items (title, description, price, images, category_id, weight) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+        values: [title, description, price, images, category_id, weight],
+      };
+      const result = await this._pool.query(query);
+      return result.rows[0].id;
   }
 
   async getItems() {
@@ -60,10 +60,10 @@ class ItemsService {
     return result.rows;
   }
 
-  async putItem(id, { title, description, price, category_id }) {
+  async putItem(id, { title, description, price, category_id, weight }) {
     const query = {
-      text: "UPDATE items SET title = $1, description = $2, price = $3, category_id = $4 WHERE id = $5",
-      values: [title, description, price, category_id, id],
+      text: "UPDATE items SET title = $1, description = $2, price = $3, category_id = $4, weight = $5 WHERE id = $6",
+      values: [title, description, price, category_id, weight, id],
     };
     await this._pool.query(query);
   }

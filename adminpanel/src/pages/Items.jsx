@@ -8,11 +8,16 @@ import { checkAuth } from "../utils/utils";
 const Items = () => {
   const [items, setItems] = useState([]);
   const [itemsEdit, setItemsEdit] = useState(0);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [onError, setOnError] = useState("");
 
   async function loadItems() {
-    const data = await fetchItems();
-    setItems(data || []); // Ensure items is always an array
-  };
+    if (!isDataLoaded) {
+      const data = await fetchItems();
+      setItems(data || []); // Ensure items is always an array
+      setIsDataLoaded(true); // Mark data as loaded
+    }
+  }
 
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -23,7 +28,7 @@ const Items = () => {
         loadItems(); // Proceed to load users if authenticated
       }
     };
-  
+
     checkAuthentication();
   }, []); // Empty dependency array means this runs once on mount
 
@@ -34,12 +39,13 @@ const Items = () => {
       setItems((prevItems) => [...prevItems, newItem]);
     } catch (error) {
       console.error("Error submitting item:", error);
-      // Handle error (e.g., show a notification)
+      //setOnError(error);
     }
   };
 
   return (
     <div className="p-4">
+      {onError ? <div className="text-red-500 p-4 mb-4">{onError}</div> : null}
       {itemsEdit === 0 ? (
         <ItemForm
           onSubmit={handleSubmit}

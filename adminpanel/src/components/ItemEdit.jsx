@@ -10,6 +10,7 @@ const ItemFormEdit = ({ id, setItemsEdit, fetchCategory, loadItems }) => {
   const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [weight, setWeight] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -30,6 +31,7 @@ const ItemFormEdit = ({ id, setItemsEdit, fetchCategory, loadItems }) => {
           setDescription(dataId.description);
           setPrice(dataId.price);
           setSelectedCategory(dataId.category_id);
+          setWeight(dataId.weight);
         } else {
           setError("Item not found.");
         }
@@ -52,6 +54,7 @@ const ItemFormEdit = ({ id, setItemsEdit, fetchCategory, loadItems }) => {
       description: description,
       price: price,
       category_id: selectedCategory,
+      weight: weight,
     }
 
     try {
@@ -61,6 +64,7 @@ const ItemFormEdit = ({ id, setItemsEdit, fetchCategory, loadItems }) => {
       setDescription("");
       setPrice("");
       setSelectedCategory(""); // Reset selected category
+      setWeight("");
       loadItems();
     } catch (err) {
       setError(err.message || "An error occurred while submitting the form.");
@@ -93,6 +97,14 @@ const ItemFormEdit = ({ id, setItemsEdit, fetchCategory, loadItems }) => {
         placeholder="Price"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
+        required
+        className="border border-gray-300 p-2 w-full mb-2 rounded"
+      />
+      <input
+        type="number"
+        placeholder="Weight (in Grams ex: 1000 it's 1000g)"
+        value={weight}
+        onChange={(e) => setWeight(e.target.value)}
         required
         className="border border-gray-300 p-2 w-full mb-2 rounded"
       />

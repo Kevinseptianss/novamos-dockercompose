@@ -10,6 +10,7 @@ const ItemForm = ({ onSubmit, fetchCategory, loadItems }) => {
   const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [weight, setWeight] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -40,6 +41,7 @@ const ItemForm = ({ onSubmit, fetchCategory, loadItems }) => {
     formData.append("description", description);
     formData.append("price", price);
     formData.append("category_id", selectedCategory);
+    formData.append("weight", weight);
     images.forEach((image) => {
       formData.append("images", image);
     });
@@ -55,6 +57,7 @@ const ItemForm = ({ onSubmit, fetchCategory, loadItems }) => {
       setPrice("");
       setImages([]);
       setSelectedCategory(""); // Reset selected category
+      setWeight("");
       loadItems();
     } catch (err) {
       setError(err.message || "An error occurred while submitting the form.");
@@ -87,6 +90,14 @@ const ItemForm = ({ onSubmit, fetchCategory, loadItems }) => {
         placeholder="Price"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
+        required
+        className="border border-gray-300 p-2 w-full mb-2 rounded"
+      />
+      <input
+        type="number"
+        placeholder="Weight (in Grams ex: 1000 it's 1000g)"
+        value={weight}
+        onChange={(e) => setWeight(e.target.value)}
         required
         className="border border-gray-300 p-2 w-full mb-2 rounded"
       />

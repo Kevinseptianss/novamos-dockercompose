@@ -25,6 +25,11 @@ const ItemsPostPayloadSchema = Joi.object({
     "string.empty": "Category ID cannot be empty",
     "any.required": "Category ID is required",
   }),
+  weight: Joi.number().required().greater(0).messages({
+    "number.base": "Weight must be a number",
+    "number.greater": "Weight must be greater than 0",
+    "any.required": "Weight is required",
+  }),
   images: Joi.array()
     .items(
       Joi.object({
